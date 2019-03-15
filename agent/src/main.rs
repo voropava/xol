@@ -5,43 +5,39 @@ fn main() {
     let s1 = String::from("Hello");
     let s2 = String::from("wor");
 
-    let clos = |len: u32| s1.len();
-
-
-    println!("Hello, wor = {}", levenstein(s1, s2, clos));
+    println!("Hello, wor = {}", levenstein(s1, s2));
 }
 
 
-fn levenstein(s1: String, s2: String, clos: &Fn) -> u32 {
-    const M: u32 =
+fn levenstein(s1: String, s2: String) -> u32 {
+    let mut vec = vec![vec![0, s2.len()]; s1.len()];
 
-    const N: u32 = |len: u32| s2.len();
+    let insert_cost: usize = 1;
+    let delete_cost: usize = 1;
+    let replace_cost: usize = 1;
 
-    let mut arr = [[0, N]; M];
-
-    let insert_cost = 1u32;
-    let delete_cost = 1u32;
-    let replace_cost = 1u32;
-
-    arr[0][0] = 0;
+    vec[0][0] = 0;
 
     for j in 1..s1.len() {
-        arr[0][j] = arr[0][j - 1] + insert_cost;
+        vec[0][j] = vec[0][j - 1] + insert_cost;
     }
 
+    let slice1 = s1.as_slice();
+    let slice2 = s1.as_slice();
+
     for i in 1..s2.len() {
-        arr[i][0] = arr[i - 1][0] + delete_cost;
+        vec[i][0] = vec[i - 1][0] + delete_cost;
 
         for j in 1..s1.len() {
-            if s1.as_slice()[j] != s2.as_slice()[j] {
-                let c1 = cmp::min(arr[i -1][j] + delete_cost, arr[i][j - 1] + insert_cost);
+            if slice1[j] != slice2[j] {
+                let c1 = cmp::min(vec[i -1][j] + delete_cost, vec[i][j - 1] + insert_cost);
 
-                arr[i][j] = cmp::min(c1, arr[i -1][j - 1] + replace_cost);
+                vec[i][j] = cmp::min(c1, vec[i -1][j - 1] + replace_cost);
             } else {
-                arr[i][j] = arr[i -1 ][j - 1];
+                vec[i][j] = vec[i -1 ][j - 1];
             }
         }
     }
 
-    return arr[s2.len()][s1.len()];
+    return vec[s2.len()][s1.len()];
 }
